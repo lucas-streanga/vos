@@ -79,7 +79,23 @@ public:
   void resize(std::size_t size)
   {
     if(size <= internal_size)
+    {
+      //Shrink!
+      T * temp = internal_data;
+      internal_data = (T *) malloc(sizeof(T) * size);
+      if(internal_data == NULL)
+      {
+        internal_data = temp;
+        throw std::bad_alloc();
+      }
+      else
+      {
+        internal_size = size;
+        memcpy(internal_data, temp, sizeof(T) * size);
+        free(temp);
+      }
       return;
+    }
     T * temp;
     temp = (T *) realloc(internal_data, sizeof(T) * size);
     if(temp == NULL)
@@ -188,6 +204,48 @@ class vos
     }
   }
 
+  void try_shrink(std::size_t new_size)
+  {
+    if(new_size >= capacity())
+      return;
+
+      std::cout << "....\n";
+
+
+    //If already on the stack, can shrink to stack
+    //If on heap, may need to shrink to stack
+
+    if(auto ptr = std::get_if<stack_buffer<i, char>>(&buffer))
+    {
+      //Basically just insert a null term and update the length, dont do any realloc
+      cur_len = new_size;
+      ptr->data()[cur_len] = 0;
+    }
+    else if(auto ptr = std::get_if<heap_buffer<char>>(&buffer))
+    {
+      std::cout << "!!" << '\n';
+      //If it can fit on the stack, move it there
+      if(new_size < i)
+      {
+        char temp[i];
+        std::cout << ptr->data() << std::endl;
+        strncpy(temp, ptr->data(), new_size);
+        buffer.template emplace<stack_buffer<i, char>>();
+        strncpy(std::get<stack_buffer<i, char>>(buffer).data(), temp, new_size);
+        cur_len = new_size;
+        std::get<stack_buffer<i, char>>(buffer).data()[cur_len - 1] = 0;
+      } //It needs to stay on the heap
+      else
+      {
+        std::cout << "....\n";
+        //Modify the internal buffer a bit to force a shrink...
+        ptr->resize(new_size);
+        cur_len = new_size;
+        ptr->data()[cur_len - 1] = 0;
+      }
+    }
+  }
+
 public:
   vos(const char * s)
   {
@@ -244,6 +302,12 @@ public:
     else if(auto ptr = std::get_if<heap_buffer<char>>(&buffer))
       ret = ptr->size();
     return ret;
+  }
+
+  void shrink_to_fit()
+  {
+    //Attempt to shrink...
+    try_shrink(cur_len + 1);
   }
 
   void clear()

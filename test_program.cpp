@@ -66,5 +66,10 @@ int main(void)
   std::cin >> v;
   std::cout << v << std::endl;
   std::cout << v.capacity() << '\n';
+  std::cout << "Size of V2: " << v2.capacity() << '\n';
+  v2 = "hello world!";
+  v2.shrink_to_fit();
+  std::cout << "Size of V2: " << v2.capacity() << '\n';
+  std::cout << v2 << '\n';
 
 }

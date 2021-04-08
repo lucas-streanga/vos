@@ -21,15 +21,33 @@ int main(void)
   h[10] = 0;
   h[19] = 0;
 
-  vos<30> v("hello world how are you?");
-  vos<10> v2 = "-200";
-  std::cout << stoull(v2) << std::endl;
-  v2 = std::move(v);
+  string32 v;
+  v = {'h', 'e'};
+  std::cout << v << std::endl;
+  v = "hello world how are you?";
+  vos<10> v2 = "A new test";
+  for(int i = 0; i < 3; i++)
+    v2.push_back('!');
+  v2.append(v);
+  v2 += "__e__";
+  std::string sss("***");
+  v2 += sss;
+  v2 += v;
+  std::cout << (v + v2) << std::endl;
+  v2 = v;
+  v2 = "kk";
+  //std::cout << stoull(v2) << std::endl;
+  //v2 = std::move(v);
   vos<1> v3;
-  v3 = "";
+  vos<5> v4 = v.substr<5>(0, 5);
+  std::cout << v4.c_str() << "!!\n";
 
-  for(auto c : v)
-    std::cout << c << '\n';
+  for(int i = 0; i < v2.size(); i++)
+  {
+    std::cout << v2[i] << '\n';
+  }
+
+  std::cout << ".";
 
   //std::cout << v.std_str() << std::endl;
 
@@ -40,4 +58,13 @@ int main(void)
 
 
   std::cout << s.size() << std::endl;
+
+  std::cout << v.capacity() << '\n';
+
+
+  //getline(std::cin, v);
+  std::cin >> v;
+  std::cout << v << std::endl;
+  std::cout << v.capacity() << '\n';
+
 }

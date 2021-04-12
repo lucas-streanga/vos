@@ -22,6 +22,11 @@ class stack_buffer
   std::size_t internal_size = i;
 
 public:
+  stack_buffer()
+  {
+    //Nothing to do here...
+    std::cout << "stack_buffer created.\n";
+  }
   T * data()
   {
     return internal_data;
@@ -44,6 +49,12 @@ public:
         throw std::out_of_range("Out of range index on stack_buffer object.");
     }
     return internal_data[index];
+  }
+
+  ~stack_buffer()
+  {
+    //Nothing to do here...
+    std::cout << "stack_buffer destroyed.\n";
   }
 };
 
@@ -68,12 +79,14 @@ public:
     {
       throw std::bad_alloc();
     }
+    std::cout << "heap_buffer created.\n";
   }
   ~heap_buffer()
   {
     //Free the data!
     if(internal_data)
       free(internal_data);
+    std::cout << "heap_buffer destroyed.\n";
   }
 
   void resize(std::size_t size)
@@ -209,9 +222,6 @@ class vos
     if(new_size >= capacity())
       return;
 
-      std::cout << "....\n";
-
-
     //If already on the stack, can shrink to stack
     //If on heap, may need to shrink to stack
 
@@ -234,10 +244,9 @@ class vos
         strncpy(std::get<stack_buffer<i, char>>(buffer).data(), temp, new_size);
         cur_len = new_size;
         std::get<stack_buffer<i, char>>(buffer).data()[cur_len - 1] = 0;
-      } //It needs to stay on the heap
-      else
+      }
+      else   //It needs to stay on the heap
       {
-        std::cout << "....\n";
         //Modify the internal buffer a bit to force a shrink...
         ptr->resize(new_size);
         cur_len = new_size;

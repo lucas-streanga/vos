@@ -9,7 +9,11 @@ using namespace ls;
 int main(void)
 {
   stack_buffer<10, int> s;
-  printf("Size of vos<8>: %lu\n", sizeof(stack_buffer<8, char>) + 8);
+  printf("Size of stack_buffer<8, char> : %lu\n", sizeof(stack_buffer<8, char>));
+  printf("Size of heap_buffer<char> : %lu\n", sizeof(heap_buffer<char>));
+  printf("Size of variant(heap_buffer, stack_buffer<16, char>) : %lu\n", sizeof(std::variant<stack_buffer<16, char>, heap_buffer<char>>));
+  printf("Size of vos<16>: %lu\n", sizeof(vos<16>));
+  printf("Size of std::string : %lu\n", sizeof(std::string));
   s[9] = 99;
   std::cout << s[9] << '\n';
   //s[10] = 0;

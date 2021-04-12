@@ -11,6 +11,7 @@
 #include<cmath>
 #include<climits>
 #include<iostream>
+#include<stdint.h>
 
 namespace ls
 {
@@ -19,13 +20,14 @@ template<std::size_t i, typename T>
 class stack_buffer
 {
   T internal_data[i];
-  std::size_t internal_size = i;
+  //We don't actually have any reason to store the internal size, since i holds this and
+  //is determined at compile time.
+  //std::size_t internal_size = i;
 
 public:
   stack_buffer()
   {
     //Nothing to do here...
-    std::cout << "stack_buffer created.\n";
   }
   T * data()
   {
@@ -39,12 +41,12 @@ public:
 
   std::size_t size() const
   {
-    return internal_size;
+    return i;
   }
 
   T& operator[](std::size_t index)
   {
-    if (index >= internal_size)
+    if (index >= i)
     {
         throw std::out_of_range("Out of range index on stack_buffer object.");
     }
@@ -54,7 +56,6 @@ public:
   ~stack_buffer()
   {
     //Nothing to do here...
-    std::cout << "stack_buffer destroyed.\n";
   }
 };
 
@@ -79,14 +80,12 @@ public:
     {
       throw std::bad_alloc();
     }
-    std::cout << "heap_buffer created.\n";
   }
   ~heap_buffer()
   {
     //Free the data!
     if(internal_data)
       free(internal_data);
-    std::cout << "heap_buffer destroyed.\n";
   }
 
   void resize(std::size_t size)
@@ -233,12 +232,10 @@ class vos
     }
     else if(auto ptr = std::get_if<heap_buffer<char>>(&buffer))
     {
-      std::cout << "!!" << '\n';
       //If it can fit on the stack, move it there
       if(new_size < i)
       {
         char temp[i];
-        std::cout << ptr->data() << std::endl;
         strncpy(temp, ptr->data(), new_size);
         buffer.template emplace<stack_buffer<i, char>>();
         strncpy(std::get<stack_buffer<i, char>>(buffer).data(), temp, new_size);
@@ -565,7 +562,6 @@ public:
   vos<i>& operator= (std::initializer_list<char> il)
   {
     try_resize(il.size() + 1);
-    std::cout << il.size();
 
     if(const auto ptr = std::get_if<stack_buffer<i, char>>(&buffer))
     {
@@ -806,7 +802,6 @@ std::istream& getline (std::istream&& is, vos<i>& str)
 }
 
 // Some typedef for some types
-typedef   vos<8>    string8;
 typedef   vos<16>   string16;
 typedef   vos<32>   string32;
 typedef   vos<64>   string64;
